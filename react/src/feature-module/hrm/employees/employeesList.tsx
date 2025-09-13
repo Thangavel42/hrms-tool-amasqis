@@ -13,7 +13,7 @@ import { useSocket } from "../../../SocketContext";
 import { Socket } from "socket.io-client";
 import { toast, ToastContainer } from "react-toastify";
 import dayjs from "dayjs";
-
+import {  useUser } from "@clerk/clerk-react";
 
 interface Department {
   _id: string;
@@ -129,7 +129,7 @@ const initialState = {
 };
 
 const EmployeeList = () => {
-
+  // const {  isLoaded } = useUser();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("basic-info");
@@ -274,9 +274,9 @@ const EmployeeList = () => {
 
     const handleEmployeeResponse = (response: any) => {
       if (!isMounted) return;
-
+      console.log("response hrm-employee", response);
       if (response.done) {
-        console.log(response);
+        console.log("response hrm-employee", response);
         if (response.data.stats) {
           setStats(response.data.stats);
         }
@@ -891,7 +891,7 @@ const EmployeeList = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     try {
       e.preventDefault();
-console.log("Helllo1");
+      console.log("Helllo1");
 
       setError("null");
 
@@ -1088,6 +1088,36 @@ console.log("Helllo1");
       ACTIONS.every(action => permissions.permissions[module][action])
     );
   };
+// incase of error (done:false)
+  if (loading) {
+    return (
+      <div className="page-wrapper">
+        <div className="content">
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ height: "400px" }}
+          >
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-wrapper">
+        <div className="content">
+          <div className="alert alert-danger" role="alert">
+            <h4 className="alert-heading">Error!</h4>
+            <p>{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -1382,7 +1412,7 @@ console.log("Helllo1");
                         Ascending
                       </button>
                     </li>
-                    <li>  
+                    <li>
                       <button
                         type="button"
                         className="dropdown-item rounded-1"
@@ -1629,11 +1659,10 @@ console.log("Helllo1");
                               onChange={handleChange}
                             />
                             <span
-                              className={`ti toggle-passwords ${
-                                passwordVisibility.password
-                                  ? "ti-eye"
-                                  : "ti-eye-off"
-                              }`}
+                              className={`ti toggle-passwords ${passwordVisibility.password
+                                ? "ti-eye"
+                                : "ti-eye-off"
+                                }`}
                               onClick={() =>
                                 togglePasswordVisibility("password")
                               }
@@ -1660,11 +1689,10 @@ console.log("Helllo1");
                               onChange={e => setConfirmPassword(e.target.value)}
                             />
                             <span
-                              className={`ti toggle-passwords ${
-                                passwordVisibility.confirmPassword
-                                  ? "ti-eye"
-                                  : "ti-eye-off"
-                              }`}
+                              className={`ti toggle-passwords ${passwordVisibility.confirmPassword
+                                ? "ti-eye"
+                                : "ti-eye-off"
+                                }`}
                               onClick={() =>
                                 togglePasswordVisibility("confirmPassword")
                               }

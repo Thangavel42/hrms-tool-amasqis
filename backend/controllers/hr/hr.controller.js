@@ -493,6 +493,8 @@ const hrDashboardController = (socket, io) => {
       }
 
       const result = await hrPolicy.displayPolicy(companyId, hrId, filters);
+      console.log(result);
+      
       socket.emit("hr/policy/get-response", result);
     } catch (error) {
       socket.emit("hr/policy/get-response", {
@@ -908,10 +910,10 @@ const hrDashboardController = (socket, io) => {
       if (!result.done) {
         console.error(
           "[hrm/designations/get] Service returned failure:",
-          result.error || result.message
+          result.error || "Failed to fetch designations"
         );
         throw new Error(
-          result.error || result.message || "Failed to display designations"
+          result.error || "Failed to fetch designations"
         );
       }
 

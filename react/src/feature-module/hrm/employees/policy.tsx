@@ -41,6 +41,10 @@ const Policy = () => {
   const [error, setError] = useState<string | null>(null);
   const [responseData, setResponseData] = useState(null);
   const [selectedDepartment, setSelectedDepartment] = useState(staticOptions[0].value);
+  const [policyError, setPolicyError] = useState<string | null>(null);
+  const [departmentError, setDepartmentError] = useState<string | null>(null);
+  const [policyLoading, setPolicyLoading] = useState(false);
+  const [departmentLoading, setDepartmentLoading] = useState(false);
 
   const socket = useSocket() as Socket | null;
 
@@ -78,16 +82,16 @@ const Policy = () => {
     };
 
     const handleGetPolicyResponse = (response: any) => {
-      clearTimeout(timeoutId);
       if (!isMounted) return;
 
       if (response.done) {
         setPolicies(response.data);
         setSortedPolicies(response.data);
-        setError(null);
+        setPolicyError(null);
         setLoading(false);
       } else {
-        setError(response.error || "Failed to fetch policies");
+
+        setPolicyError(response.error || "Failed to fetch policies");
         setLoading(false);
       }
     };
@@ -129,10 +133,10 @@ const Policy = () => {
 
       if (response.done) {
         setDepartments(response.data);
-        setError(null);
+        setDepartmentError(null);
         setLoading(false);
       } else {
-        setError(response.error || "Failed to add policy");
+        setDepartmentError(response.error || "Failed to fetch departments");
         setLoading(false);
       }
     }
@@ -165,7 +169,7 @@ const Policy = () => {
     : [];
 
   const options = [...staticOptions, ...dynamicOptions];
-  
+
   const columns = [
     {
       title: "Name",
@@ -281,7 +285,7 @@ const Policy = () => {
   };
 
   console.log("selected department", selectedDepartment);
-  
+
   const applyFilters = (updatedFields: {
     department?: string;
     startDate?: string;
@@ -420,6 +424,36 @@ const Policy = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="page-wrapper">
+        <div className="content">
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ height: "400px" }}
+          >
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (policyError || departmentError) {
+    return (
+      <div className="page-wrapper">
+        <div className="content">
+          <div className="alert alert-danger" role="alert">
+            <h4 className="alert-heading">Error!</h4>
+            <p>Failed to fetch policies</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Page Wrapper */}
@@ -510,17 +544,25 @@ const Policy = () => {
                     Department
                   </Link>
                   <ul className="dropdown-menu dropdown-menu-end p-3">
-                    {options.map((dept) => (
-                      <li key={dept.value}>
-                        <button
-                          type="button"
-                          className="dropdown-item rounded-1"
-                          onClick={() => onSelectDepartment(dept.value)}
-                        >
-                          {dept.label}
-                        </button>
+                    {departmentError ? (
+                      <li>
+                        <div className="alert alert-danger mb-0 p-2" role="alert">
+                          <small>{departmentError}</small>
+                        </div>
                       </li>
-                    ))}
+                    ) : (
+                      options.map((dept) => (
+                        <li key={dept.value}>
+                          <button
+                            type="button"
+                            className="dropdown-item rounded-1"
+                            onClick={() => onSelectDepartment(dept.value)}
+                          >
+                            {dept.label}
+                          </button>
+                        </li>
+                      ))
+                    )}
                   </ul>
                 </div>
                 <div className="dropdown">
