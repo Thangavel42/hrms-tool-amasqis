@@ -62,7 +62,11 @@ const Policy = () => {
         setLoading(false);
       }
     }, 30000);
+
+    setPolicyLoading(true);
     socket.emit("hr/policy/get");
+
+    setDepartmentLoading(true);
     socket.emit("hr/departments/get");
 
     const handleAddPolicyResponse = (response: any) => {
@@ -82,6 +86,7 @@ const Policy = () => {
     };
 
     const handleGetPolicyResponse = (response: any) => {
+      setPolicyLoading(false);
       if (!isMounted) return;
 
       if (response.done) {
@@ -90,7 +95,6 @@ const Policy = () => {
         setPolicyError(null);
         setLoading(false);
       } else {
-
         setPolicyError(response.error || "Failed to fetch policies");
         setLoading(false);
       }
@@ -129,6 +133,7 @@ const Policy = () => {
     }
 
     const handleDepartmentsResponse = (response: any) => {
+      setDepartmentLoading(false);
       if (!isMounted) return;
 
       if (response.done) {
@@ -160,6 +165,9 @@ const Policy = () => {
   }, [socket]);
 
   // constants
+  if (error) console.error("Page error:", error);
+  if (policyError) console.error("Policy error:", policyError);
+  if (departmentError) console.error("Department error:", departmentError);
 
   const dynamicOptions = Array.isArray(departments)
     ? departments.map(dept => ({
@@ -424,7 +432,7 @@ const Policy = () => {
     }
   };
 
-  if (loading) {
+  if (policyLoading || departmentLoading) {
     return (
       <div className="page-wrapper">
         <div className="content">

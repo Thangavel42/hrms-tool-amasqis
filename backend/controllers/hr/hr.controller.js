@@ -493,8 +493,6 @@ const hrDashboardController = (socket, io) => {
       }
 
       const result = await hrPolicy.displayPolicy(companyId, hrId, filters);
-      console.log(result);
-      
       socket.emit("hr/policy/get-response", result);
     } catch (error) {
       socket.emit("hr/policy/get-response", {
