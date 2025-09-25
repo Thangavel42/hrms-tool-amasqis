@@ -14,7 +14,7 @@ import { Socket } from "socket.io-client";
 import { toast, ToastContainer } from "react-toastify";
 import dayjs from "dayjs";
 import Footer from "../../../core/common/footer";
-import {  useUser } from "@clerk/clerk-react";
+
 
 interface Department {
   _id: string;
