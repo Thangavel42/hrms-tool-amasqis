@@ -392,7 +392,7 @@ const EmployeeList = () => {
       title: "Emp ID",
       dataIndex: "employeeId",
       render: (text: String, record: any) => (
-        <Link to={all_routes.employeedetails}>{text}</Link>
+        <Link to={`/employees/${record._id}`}>{text}</Link>
       ),
       sorter: (a: any, b: any) => a.EmpId.length - b.EmpId.length,
     },
@@ -403,11 +403,8 @@ const EmployeeList = () => {
         return (
           <div className="d-flex align-items-center">
             <Link
-              to={all_routes.employeedetails}
+              to={`/employees/${record._id}`}
               className="avatar avatar-md"
-              data-bs-toggle="modal"
-              data-inert={true}
-              data-bs-target="#view_details"
             >
               <img
                 src={record.avatarUrl || "assets/img/favicon.png"}
@@ -418,10 +415,7 @@ const EmployeeList = () => {
             <div className="ms-2">
               <p className="text-dark mb-0">
                 <Link
-                  to={all_routes.employeedetails}
-                  data-bs-toggle="modal"
-                  data-inert={true}
-                  data-bs-target="#view_details"
+                  to={`/employees/${record._id}`}
                 >
                   {record.firstName} {record.lastName}
                 </Link>
