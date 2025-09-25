@@ -34,7 +34,7 @@ export const addHoliday = async (companyId, hrId, holidaydata) => {
 
     if (existingHoliday) {
       console.log("swetyy");
-      
+
       return {
         done: false,
         message: "A holiday already exists on this date",
@@ -110,6 +110,18 @@ export const updateHoliday = async (companyId, hrId, payload) => {
       return {
         done: false,
         message: "Title, date, description and status are required",
+      };
+    }
+
+    const existingHoliday = await collections.holidays.findOne({
+      date: new Date(payload.date),
+      _id: { $ne: new ObjectId(payload.holidayId) },
+    });
+
+    if (existingHoliday) {
+      return {
+        done: false,
+        message: "A holiday already exists on this date.",
       };
     }
 

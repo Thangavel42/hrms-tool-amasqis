@@ -73,7 +73,7 @@ const Holidays = () => {
         setResponseData(response.data);
         setError(null);
         setLoading(false);
-      } else {        
+      } else {
         setError(response.message || response.error || "Failed to get holiday");
         toast.error(error);
         setLoading(false);
@@ -108,7 +108,7 @@ const Holidays = () => {
         if (socket) {
           socket.emit("hrm/holiday/get");
         }
-      } else {    
+      } else {
         setError(response.message || response.error || "Failed to delete holiday");
         toast.error(error);
         setLoading(false);
@@ -146,7 +146,7 @@ const Holidays = () => {
         setLoading(false);
         return;
       }
-            
+
       socket.emit("hrm/holiday/delete", holidayId);
     } catch (error) {
       setError("Failed to initiate holiday deletion");
@@ -225,6 +225,23 @@ const Holidays = () => {
       ),
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="page-wrapper">
+        <div className="content">
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ height: "400px" }}
+          >
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     console.error(error);
