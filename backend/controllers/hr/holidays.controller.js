@@ -95,6 +95,7 @@ const holidayController = (socket, io) => {
             socket.emit("hrm/holiday/get-response", toErr(error));
         }
     });
+
     socket.on("hrm/holiday/add", withRateLimit(async (formData) => {
         try {
             console.log("Hello from add controller", formData);
@@ -114,6 +115,25 @@ const holidayController = (socket, io) => {
         }
     }))
 
+    socket.on("hrm/holiday/update", withRateLimit(async (payload) => {
+        try {
+            const { companyId, hrId } = validateHrAccess(socket);
+            const result = await hrmHolidays.updateHoliday(companyId, hrId, payload);
+            socket.emit("hrm/holiday/update-response", result);
+        } catch (error) {
+            socket.emit("hrm/holiday/update-response", toErr(error));
+        }
+    }));
+
+    socket.on("hrm/holiday/delete", withRateLimit(async (holidayId) => {
+        try {
+            const { companyId, hrId } = validateHrAccess(socket);
+            const result = await hrmHolidays.deleteHoliday(companyId, holidayId);
+            socket.emit("hrm/holiday/update-response", result);
+        } catch (error) {
+            socket.emit("hrm/holiday/delete-response", toErr(error));
+        }
+    }));
 }
 
 export default holidayController;

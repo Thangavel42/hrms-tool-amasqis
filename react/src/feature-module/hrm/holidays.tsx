@@ -14,6 +14,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 interface Holidays {
+  _id: string;
   title: string;
   date: string;
   description: string;
@@ -69,26 +70,89 @@ const Holidays = () => {
 
       if (response.done) {
         setHoliday(response.data);
-        console.log("holidays from tsx", response.data);
         setResponseData(response.data);
         setError(null);
         setLoading(false);
+      } else {        
+        setError(response.message || response.error || "Failed to get holiday");
+        toast.error(error);
+        setLoading(false);
+      }
+    };
+
+    const handleEditHolidayResponse = (response: any) => {
+      if (!isMounted) return;
+
+      if (response.done) {
+        setResponseData(response.data);
+        setError(null);
+        setLoading(false);
+        if (socket) {
+          socket.emit("hrm/holiday/get");
+        }
       } else {
         setError(response.message || "Failed to get holiday");
         toast.error(error);
         setLoading(false);
       }
-    };
+    }
+
+    const handleDeleteHolidayResponse = (response: any) => {
+      if (!isMounted) return;
+
+      if (response.done) {
+        setResponseData(response.data);
+        toast.success("Holiday deleted successfully");
+        setError(null);
+        setLoading(false);
+        if (socket) {
+          socket.emit("hrm/holiday/get");
+        }
+      } else {    
+        setError(response.message || response.error || "Failed to delete holiday");
+        toast.error(error);
+        setLoading(false);
+      }
+    }
+
     socket.on("hrm/holiday/add-response", handleAddHolidayResponse);
     socket.on("hrm/holiday/get-response", handleGetHolidayResponse);
+    socket.on("hrm/holiday/update-response", handleEditHolidayResponse);
+    socket.on("hrm/holiday/delete-response", handleDeleteHolidayResponse);
     return () => {
       isMounted = false;
       clearTimeout(timeoutId);
       socket.off("hrm/holiday/add-response", handleAddHolidayResponse);
       socket.off("hrm/holiday/get-response", handleGetHolidayResponse);
+      socket.off("hrm/holiday/update-response", handleEditHolidayResponse);
+      socket.off("hrm/holiday/delete-response", handleDeleteHolidayResponse);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket]);
+
+  const handleDeleteHoliday = (holidayId: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      if (!socket) {
+        setError("Socket connection is not available");
+        setLoading(false);
+        return;
+      }
+
+      if (!holidayId) {
+        setError("Holiday ID is required");
+        setLoading(false);
+        return;
+      }
+            
+      socket.emit("hrm/holiday/delete", holidayId);
+    } catch (error) {
+      setError("Failed to initiate holiday deletion");
+      setLoading(false);
+    }
+  };
 
   const routes = all_routes;
   const data = holiday;
@@ -136,7 +200,7 @@ const Holidays = () => {
     {
       title: "",
       dataIndex: "actions",
-      render: (test: any, holiday: Holidays) => () => (
+      render: (_test: any, holiday: Holidays) => (
         <div className="action-icon d-inline-flex">
           <Link
             to="#"
@@ -161,10 +225,12 @@ const Holidays = () => {
       ),
     },
   ];
+
   if (error) {
     console.error(error);
     toast.error(error);
   }
+
   return (
     <>
       {/* Page Wrapper */}
@@ -220,8 +286,50 @@ const Holidays = () => {
       </div>
       {/* /Page Wrapper */}
 
-      <HolidaysModal socket={socket} />
+      <HolidaysModal socket={socket} editingHoliday={editingHoliday} />
       <ToastContainer />
+      {/* delete modal */}
+      <div className="modal fade" id="delete_modal">
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-body text-center">
+              <span className="avatar avatar-xl bg-transparent-danger text-danger mb-3">
+                <i className="ti ti-trash-x fs-36" />
+              </span>
+              <h4 className="mb-1">Confirm Deletion</h4>
+              <p className="mb-3">
+                {deleteHoliday
+                  ? `Are you sure you want to delete holiday "${deleteHoliday.title}"? This cannot be undone.`
+                  : "You want to delete all the marked holidays, this can't be undone once you delete."}
+              </p>
+              <div className="d-flex justify-content-center">
+                <button
+                  className="btn btn-light me-3"
+                  data-bs-dismiss="modal"
+                  onClick={() => setDeleteHoliday(null)}
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn btn-danger"
+                  data-bs-dismiss="modal"
+                  onClick={() => {
+                    if (deleteHoliday) {
+                      handleDeleteHoliday(deleteHoliday._id);
+                    }
+                    setDeleteHoliday(null);
+                  }}
+                  disabled={loading}
+                >
+                  {loading ? "Deleting..." : "Yes, Delete"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* delete modal */}
     </>
   );
 };

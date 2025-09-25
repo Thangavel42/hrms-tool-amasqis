@@ -93,3 +93,80 @@ export const displayHoliday = async (companyId) => {
     };
   }
 };
+
+export const updateHoliday = async (companyId, hrId, payload) => {
+  try {
+    if (!companyId || !payload) {
+      return { done: false, message: "Missing required parameters" };
+    }
+
+    const collections = getTenantCollections(companyId);
+
+    if (!payload.holidayId) {
+      return { done: false, message: "Holiday ID not found" };
+    }
+
+    if (!payload.title || !payload.date || !payload.description || !payload.status) {
+      return {
+        done: false,
+        message: "Title, date, description and status are required",
+      };
+    }
+
+    const result = await collections.holidays.updateOne(
+      { _id: new ObjectId(payload.holidayId) },
+      {
+        $set: {
+          title: payload.title,
+          date: new Date(payload.date),
+          description: payload.description,
+          status: payload.status,
+          updatedBy: hrId,
+          updatedAt: new Date(),
+        },
+      }
+    );
+
+    if (result.matchedCount === 0) {
+      return { done: false, message: "Holiday not found" };
+    }
+
+    return {
+      done: true,
+      data: { holidayId: payload.holidayId, ...payload },
+      message: "Holiday updated successfully",
+    };
+  } catch (error) {
+    return {
+      done: false,
+      error: `Failed to update holiday: ${error.message}`,
+    };
+  }
+};
+
+export const deleteHoliday = async (companyId, holidayId) => {
+  try {
+    if (!companyId || !holidayId) {
+      return { done: false, message: "Missing required parameters" };
+    }
+    const collections = getTenantCollections(companyId);
+    const result = await collections.holidays.deleteOne({
+      _id: new ObjectId(holidayId),
+    });
+
+    if (result.deletedCount === 0) {
+      return { done: false, message: "Holiday not found" };
+    }
+
+    return {
+      done: true,
+      data: { holidayId },
+      message: "Holiday deleted successfully",
+    };
+  } catch (error) {
+    return {
+      done: false,
+      error: `Failed to delete holiday: ${error.message}`,
+    };
+  }
+};
