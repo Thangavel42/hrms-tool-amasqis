@@ -9,11 +9,8 @@ import { useSocket } from "../../../SocketContext";
 import { Socket } from "socket.io-client";
 import { toast, ToastContainer } from "react-toastify";
 import dayjs from "dayjs";
-<<<<<<< HEAD
 import { useUser } from "@clerk/clerk-react";
-=======
 import Footer from "../../../core/common/footer";
->>>>>>> d04dc1e3335cb6dab3c61742071326131babf370
 
 type PasswordField = "password" | "confirmPassword";
 type PermissionAction = "read" | "write" | "create" | "delete" | "import" | "export";
