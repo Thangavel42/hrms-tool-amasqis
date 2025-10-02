@@ -32,6 +32,20 @@ interface Option {
   value: string,
 }
 
+interface Address {
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+}
+
+interface PersonalInfo {
+  gender: string;
+  birthday: string | null;
+  address: Address;
+}
+
 interface Employee {
   _id: string;
   employeeId: string;
@@ -45,6 +59,7 @@ interface Employee {
     email: string;
     phone: string;
   },
+  personal?: PersonalInfo;
   companyName: string;
   departmentId: string;
   designationId: string;
@@ -171,6 +186,17 @@ const EmployeeList = () => {
     account: {
       userName: "",
       password: "",
+    },
+    personal: {
+      gender: "",
+      birthday: "",
+      address: {
+        street: "",
+        city: "",
+        state: "",
+        postalCode: "",
+        country: ""
+      }
     },
     companyName: "",
     designationId: "",
@@ -502,7 +528,7 @@ const EmployeeList = () => {
   });
 
   // Helper functions
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (name === "email" || name === "phone") {
       setFormData(prev => ({
@@ -518,6 +544,25 @@ const EmployeeList = () => {
         account: {
           ...prev.account,
           [name]: value
+        }
+      }));
+    } else if (name === "gender") {
+      setFormData(prev => ({
+        ...prev,
+        personal: {
+          ...prev.personal,
+          gender: value
+        }
+      }));
+    } else if (name === "street" || name === "city" || name === "state" || name === "postalCode" || name === "country") {
+      setFormData(prev => ({
+        ...prev,
+        personal: {
+          ...prev.personal,
+          address: {
+            ...prev.personal?.address,
+            [name]: value
+          }
         }
       }));
     } else {
@@ -872,6 +917,14 @@ const EmployeeList = () => {
       alert("Please fill in phone");
       return false;
     }
+    if (!formData.personal?.gender) {
+      alert("Please select gender");
+      return false;
+    }
+    if (!formData.personal?.birthday) {
+      alert("Please select birthday");
+      return false;
+    }
 
     // Check password match
     if (formData.account.password !== confirmPassword) {
@@ -886,7 +939,7 @@ const EmployeeList = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     try {
       e.preventDefault();
-console.log("Helllo1");
+      console.log("Helllo1");
 
       setError("null");
 
@@ -917,6 +970,7 @@ console.log("Helllo1");
           userName,
           password,
         },
+        personal,
         companyName,
         departmentId,
         designationId,
@@ -936,6 +990,17 @@ console.log("Helllo1");
         contact: {
           email,
           phone,
+        },
+        personal: {
+          gender: personal?.gender || "",
+          birthday: personal?.birthday || null,
+          address: {
+            street: personal?.address?.street || "",
+            city: personal?.address?.city || "",
+            state: personal?.address?.state || "",
+            postalCode: personal?.address?.postalCode || "",
+            country: personal?.address?.country || ""
+          }
         },
         companyName,
         departmentId,
@@ -988,6 +1053,11 @@ console.log("Helllo1");
       contact: {
         email: editingEmployee.contact.email,
         phone: editingEmployee.contact.phone,
+      },
+      personal: {
+        gender: editingEmployee.personal?.gender,
+        birthday: editingEmployee.personal?.birthday,
+        address: editingEmployee.personal?.address
       },
       companyName: editingEmployee.companyName || editingEmployee.companyName,
       departmentId: editingEmployee.departmentId,
@@ -1048,6 +1118,17 @@ console.log("Helllo1");
       account: {
         userName: "",
         password: "",
+      },
+      personal: {
+        gender: "",
+        birthday: "",
+        address: {
+          street: "",
+          city: "",
+          state: "",
+          postalCode: "",
+          country: ""
+        }
       },
       companyName: "",
       departmentId: "",
@@ -1377,7 +1458,7 @@ console.log("Helllo1");
                         Ascending
                       </button>
                     </li>
-                    <li>  
+                    <li>
                       <button
                         type="button"
                         className="dropdown-item rounded-1"
@@ -1599,6 +1680,159 @@ console.log("Helllo1");
                         </div>
                       </div>
                       <div className="col-md-6">
+                        <div className="mb-3">
+                          <label className="form-label">
+                            Gender <span className="text-danger"> *</span>
+                          </label>
+                          <select
+                            className="form-control"
+                            name="gender"
+                            value={formData.personal?.gender || ""}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              personal: {
+                                ...prev.personal,
+                                gender: e.target.value
+                              }
+                            }))}
+                          >
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label className="form-label">
+                            Birthday <span className="text-danger"> *</span>
+                          </label>
+                          <div className="input-icon-end position-relative">
+                            <DatePicker
+                              className="form-control datetimepicker"
+                              format="DD-MM-YYYY"
+                              getPopupContainer={getModalContainer}
+                              placeholder="DD-MM-YYYY"
+                              name="birthday"
+                              value={formData.personal?.birthday ? dayjs(formData.personal.birthday) : null}
+                              onChange={(date) => setFormData(prev => ({
+                                ...prev,
+                                personal: {
+                                  ...prev.personal,
+                                  birthday: date ? date.toDate().toISOString() : null
+                                }
+                              }))}
+                            />
+                            <span className="input-icon-addon">
+                              <i className="ti ti-calendar text-gray-7" />
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-12">
+                        <div className="mb-3">
+                          <label className="form-label">Address</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Street"
+                            name="street"
+                            value={formData.personal?.address?.street || ""}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              personal: {
+                                ...prev.personal,
+                                address: {
+                                  ...prev.personal?.address,
+                                  street: e.target.value
+                                }
+                              }
+                            }))}
+                          />
+                          <div className="row mt-3">
+                            <div className="col-md-6">
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="City"
+                                name="city"
+                                value={formData.personal?.address?.city || ""}
+                                onChange={(e) => setFormData(prev => ({
+                                  ...prev,
+                                  personal: {
+                                    ...prev.personal,
+                                    address: {
+                                      ...prev.personal?.address,
+                                      city: e.target.value
+                                    }
+                                  }
+                                }))}
+                              />
+                            </div>
+                            <div className="col-md-6">
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="State"
+                                name="state"
+                                value={formData.personal?.address?.state || ""}
+                                onChange={(e) => setFormData(prev => ({
+                                  ...prev,
+                                  personal: {
+                                    ...prev.personal,
+                                    address: {
+                                      ...prev.personal?.address,
+                                      state: e.target.value
+                                    }
+                                  }
+                                }))}
+                              />
+                            </div>
+                          </div>
+                          <div className="row mt-3">
+                            <div className="col-md-6">
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Postal Code"
+                                name="postalCode"
+                                value={formData.personal?.address?.postalCode || ""}
+                                onChange={(e) => setFormData(prev => ({
+                                  ...prev,
+                                  personal: {
+                                    ...prev.personal,
+                                    address: {
+                                      ...prev.personal?.address,
+                                      postalCode: e.target.value
+                                    }
+                                  }
+                                }))}
+                              />
+                            </div>
+                            <div className="col-md-6">
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Country"
+                                name="country"
+                                value={formData.personal?.address?.country || ""}
+                                onChange={(e) => setFormData(prev => ({
+                                  ...prev,
+                                  personal: {
+                                    ...prev.personal,
+                                    address: {
+                                      ...prev.personal?.address,
+                                      country: e.target.value
+                                    }
+                                  }
+                                }))}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-6">
                         <div className="mb-3 ">
                           <label className="form-label">
                             Password <span className="text-danger"> *</span>
@@ -1616,11 +1850,10 @@ console.log("Helllo1");
                               onChange={handleChange}
                             />
                             <span
-                              className={`ti toggle-passwords ${
-                                passwordVisibility.password
+                              className={`ti toggle-passwords ${passwordVisibility.password
                                   ? "ti-eye"
                                   : "ti-eye-off"
-                              }`}
+                                }`}
                               onClick={() =>
                                 togglePasswordVisibility("password")
                               }
@@ -1647,11 +1880,10 @@ console.log("Helllo1");
                               onChange={e => setConfirmPassword(e.target.value)}
                             />
                             <span
-                              className={`ti toggle-passwords ${
-                                passwordVisibility.confirmPassword
+                              className={`ti toggle-passwords ${passwordVisibility.confirmPassword
                                   ? "ti-eye"
                                   : "ti-eye-off"
-                              }`}
+                                }`}
                               onClick={() =>
                                 togglePasswordVisibility("confirmPassword")
                               }
@@ -2098,6 +2330,166 @@ console.log("Helllo1");
                               setEditingEmployee(prev =>
                                 prev ? { ...prev, contact: { ...prev.contact, email: e.target.value } } : prev)}
                           />
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label className="form-label">
+                            Gender <span className="text-danger"> *</span>
+                          </label>
+                          <select
+                            className="form-control"
+                            value={editingEmployee?.personal?.gender || ""}
+                            onChange={(e) =>
+                              setEditingEmployee(prev =>
+                                prev ? {
+                                  ...prev,
+                                  personal: {
+                                    ...prev.personal,
+                                    gender: e.target.value
+                                  }
+                                } : prev)}
+                          >
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label className="form-label">
+                            Birthday <span className="text-danger"> *</span>
+                          </label>
+                          <div className="input-icon-end position-relative">
+                            <DatePicker
+                              className="form-control datetimepicker"
+                              format="DD-MM-YYYY"
+                              getPopupContainer={getModalContainer}
+                              placeholder="DD-MM-YYYY"
+                              value={editingEmployee?.personal?.birthday ? dayjs(editingEmployee.personal.birthday) : null}
+                              onChange={(date) =>
+                                setEditingEmployee(prev =>
+                                  prev ? {
+                                    ...prev,
+                                    personal: {
+                                      ...prev.personal,
+                                      birthday: date ? date.toDate().toISOString() : null
+                                    }
+                                  } : prev)}
+                            />
+                            <span className="input-icon-addon">
+                              <i className="ti ti-calendar text-gray-7" />
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-12">
+                        <div className="mb-3">
+                          <label className="form-label">Address</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Street"
+                            value={editingEmployee?.personal?.address?.street || ""}
+                            onChange={(e) =>
+                              setEditingEmployee(prev =>
+                                prev ? {
+                                  ...prev,
+                                  personal: {
+                                    ...prev.personal,
+                                    address: {
+                                      ...prev.personal?.address,
+                                      street: e.target.value
+                                    }
+                                  }
+                                } : prev)}
+                          />
+                          <div className="row mt-3">
+                            <div className="col-md-6">
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="City"
+                                value={editingEmployee?.personal?.address?.city || ""}
+                                onChange={(e) =>
+                                  setEditingEmployee(prev =>
+                                    prev ? {
+                                      ...prev,
+                                      personal: {
+                                        ...prev.personal,
+                                        address: {
+                                          ...prev.personal?.address,
+                                          city: e.target.value
+                                        }
+                                      }
+                                    } : prev)}
+                              />
+                            </div>
+                            <div className="col-md-6">
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="State"
+                                value={editingEmployee?.personal?.address?.state || ""}
+                                onChange={(e) =>
+                                  setEditingEmployee(prev =>
+                                    prev ? {
+                                      ...prev,
+                                      personal: {
+                                        ...prev.personal,
+                                        address: {
+                                          ...prev.personal?.address,
+                                          state: e.target.value
+                                        }
+                                      }
+                                    } : prev)}
+                              />
+                            </div>
+                          </div>
+                          <div className="row mt-3">
+                            <div className="col-md-6">
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Postal Code"
+                                value={editingEmployee?.personal?.address?.postalCode || ""}
+                                onChange={(e) =>
+                                  setEditingEmployee(prev =>
+                                    prev ? {
+                                      ...prev,
+                                      personal: {
+                                        ...prev.personal,
+                                        address: {
+                                          ...prev.personal?.address,
+                                          postalCode: e.target.value
+                                        }
+                                      }
+                                    } : prev)}
+                              />
+                            </div>
+                            <div className="col-md-6">
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Country"
+                                value={editingEmployee?.personal?.address?.country || ""}
+                                onChange={(e) =>
+                                  setEditingEmployee(prev =>
+                                    prev ? {
+                                      ...prev,
+                                      personal: {
+                                        ...prev.personal,
+                                        address: {
+                                          ...prev.personal?.address,
+                                          country: e.target.value
+                                        }
+                                      }
+                                    } : prev)}
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
                       <div className="col-md-6">
