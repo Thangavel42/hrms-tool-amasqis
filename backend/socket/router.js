@@ -9,6 +9,11 @@ import { ChatController } from "../controllers/chat/chat.controller.js";
 import { ChatUsersController } from "../controllers/chat/users.controller.js";
 import userSocketController from "../controllers/user/user.socket.controller.js";
 import socialFeedSocketController from "../controllers/socialfeed/socialFeed.socket.controller.js";
+import employeeController from "../controllers/employee/employee.controller.js";
+import notesController from "../controllers/employee/notes.controller.js";
+import ticketsSocketController from "../controllers/tickets/tickets.socket.controller.js";
+
+import jobsController from "../controllers/jobs/jobs.controllers.js";
 import candidateController from "../controllers/candidates/candidates.controllers.js";
 import jobController from "../controllers/jobs/jobs.controllers.js";
 import employeeController from "../controllers/employee/employee.controller.js";
@@ -70,6 +75,14 @@ const router = (socket, io, role) => {
       // Initialize profile controller for all authenticated users
   console.log("Attaching profile controller...");
   profileController(socket, io);
+      console.log("Attaching admin notes controller...");
+      notesController(socket, io);
+      console.log("Attaching tickets controller for admin...");
+      ticketsSocketController(socket, io);
+      console.log("Attaching candidate controller for admin...");
+      candidateController(socket, io);
+      console.log("Attaching jobsController for admin...");
+      jobsController(socket, io);
       break;
 
     case "hr":
@@ -86,6 +99,12 @@ const router = (socket, io, role) => {
       socialFeedSocketController(socket, io);
       console.log("Attaching pipeline controller for hr...");
       pipelineController(socket, io);
+      console.log("Attaching hr notes controller...");
+      notesController(socket, io);
+      console.log("Attaching tickets controller for hr...");
+      ticketsSocketController(socket, io);
+      console.log("Attaching jobs controller for hr...");
+      jobsController(socket, io);
       console.log("Attaching candidate controller for hr...");
       candidateController(socket, io);
       console.log("Attaching job controller for hr...");
