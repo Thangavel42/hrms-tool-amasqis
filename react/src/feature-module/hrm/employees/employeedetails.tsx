@@ -442,7 +442,7 @@ const EmployeeDetails = () => {
     };
     const { employeeId } = useParams();
     const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [employee, setEmployee] = useState<Employee | null>(null);
     const socket = useSocket() as Socket | null;
     const [passwordVisibility, setPasswordVisibility] = useState({
@@ -561,8 +561,7 @@ const EmployeeDetails = () => {
                 setLoading(false);
             } else {
                 console.log(error);
-
-                setError(response.error || "Failed to add policy");
+                setError(response.error || "Failed to fetch details");
                 setLoading(false);
             }
         };
@@ -578,8 +577,8 @@ const EmployeeDetails = () => {
     if (!employeeId) {
         return (
             <div className='alert alert-warning d-flex align-items-center justify-content-center pt-50 mt-5'>
-                <Link to={`/employees/`} className="btn btn-outline-primary btn-sm">
-                    Select an employee from the Employees List
+                <Link to={`/employees-grid/`} className="btn btn-outline-primary btn-sm">
+                    Select an employee from the Employees Grid
                 </Link>
             </div>
         )
@@ -589,8 +588,16 @@ const EmployeeDetails = () => {
         return <p className='text-center'>Loading employee data</p>
     }
 
-    if (!employee) {
-        return <p className='text-center'>No Data found for this employee</p>
+    if ( error && !employee) {
+        return (<div className="page-wrapper">
+            <div className="content">
+                <div className="alert alert-danger" role="alert">
+                    <h4 className="alert-heading">Error!</h4>
+                    <p>{error}</p>
+                </div>
+            </div>
+        </div>
+        )
     }
 
     const togglePasswordVisibility = (field: PasswordField) => {
@@ -721,15 +728,6 @@ const EmployeeDetails = () => {
         const year = date.getFullYear();
 
         return `${day} ${month} ${year}`;
-    }
-
-    if (!employee) {
-        return (
-            <div>
-                <p>Employee not found.</p>
-                <Link to={`${all_routes}/employees/`}>Go to Employees List</Link>
-            </div>
-        );
     }
 
     return (
