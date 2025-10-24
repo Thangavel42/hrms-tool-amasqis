@@ -9,6 +9,7 @@ import { useSocket } from "../../../SocketContext";
 import { Socket } from "socket.io-client";
 import { toast, ToastContainer } from "react-toastify";
 import dayjs from "dayjs";
+import { useUser } from "@clerk/clerk-react";
 import Footer from "../../../core/common/footer";
 
 type PasswordField = "password" | "confirmPassword";
@@ -130,6 +131,7 @@ const initialState = {
 };
 
 const EmployeesGrid = () => {
+   const {  isLoaded } = useUser();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("basic-info");
@@ -831,6 +833,35 @@ const EmployeesGrid = () => {
     }
   };
 
+  if (loading || !isLoaded) {
+    return (
+      <div className="page-wrapper">
+        <div className="content">
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ height: "400px" }}
+          >
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-wrapper">
+        <div className="content">
+          <div className="alert alert-danger" role="alert">
+            <h4 className="alert-heading">Error!</h4>
+            <p>{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       {/* Page Wrapper */}
@@ -1101,7 +1132,7 @@ const EmployeesGrid = () => {
             {/* <div className="col-md-12">
                             <div className="text-center mb-4"> */}
             {employees.length === 0 ? (
-                <p className='text-center'>No employees found</p>
+              <p className='text-center'>No employees found</p>
             ) : (employees.map(emp => {
               const {
                 _id,

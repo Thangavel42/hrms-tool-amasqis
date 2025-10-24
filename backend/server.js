@@ -15,6 +15,7 @@ import companiesRoutes from "./routes/companies.routes.js";
 import contactRoutes from "./routes/contacts.routes.js";
 import goalTypeRoutes from "./routes/performance/goalType.routes.js";
 import goalTrackingRoutes from "./routes/performance/goalTracking.routes.js";
+import ticketRoutes from "./routes/tickets.routes.js";
 
 config();
 
@@ -73,6 +74,7 @@ const initializeServer = async () => {
     app.use("/api/contacts", contactRoutes);
     app.use("/api/performance/goal-types", goalTypeRoutes);
     app.use("/api/performance/goal-trackings", goalTrackingRoutes);
+    app.use("/api/tickets", ticketRoutes);
 
     app.get("/", (req, res) => {
       res.send("API is running");

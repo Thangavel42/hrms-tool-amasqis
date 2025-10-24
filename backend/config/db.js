@@ -83,6 +83,11 @@ export const getTenantCollections = (tenantDbName) => {
     policy: db.collection("policy"),
     designations: db.collection("designations"),
     assets: db.collection("assets"),
+    holidays: db.collection("holidays"),
+
+    // invoice section
+    addInvoices: db.collection("invoices"),
+
     termination: db.collection("termination"),
     resignation: db.collection("resignation"),
 
@@ -93,6 +98,10 @@ export const getTenantCollections = (tenantDbName) => {
     // Performance Management Collections
     goalTypes: db.collection("goalTypes"),
     goalTrackings: db.collection("goalTrackings"),
+    //profile collection
+    profile: db.collection("profile")
+    tickets: db.collection("tickets"),
+    candidates: db.collection("candidates")
   };
 };
 
