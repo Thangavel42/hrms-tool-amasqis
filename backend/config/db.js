@@ -95,6 +95,10 @@ export const getTenantCollections = (tenantDbName) => {
     notes: db.collection("notes"),
     candidates: db.collection("candidates"),
 
+
+    performanceIndicators: db.collection("performanceIndicators"),
+    performanceAppraisals: db.collection("performanceAppraisals"),
+    performanceReviews: db.collection("performanceReviews")
     // Performance Management Collections
     goalTypes: db.collection("goalTypes"),
     goalTrackings: db.collection("goalTrackings"),
