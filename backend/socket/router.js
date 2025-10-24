@@ -15,6 +15,9 @@ import ticketsSocketController from "../controllers/tickets/tickets.socket.contr
 
 import jobsController from "../controllers/jobs/jobs.controllers.js";
 import candidateController from "../controllers/candidates/candidates.controllers.js";
+import trainersController from "../controllers/hr/trainers.controller.js";
+import goalTypeController from "../controllers/performance/goalType.controller.js";
+import goalTrackingController from "../controllers/performance/goalTracking.controller.js";
 import jobController from "../controllers/jobs/jobs.controllers.js";
 import employeeController from "../controllers/employee/employee.controller.js";
 import profileController from "../controllers/pages/profilepage.controllers.js";
@@ -83,6 +86,11 @@ const router = (socket, io, role) => {
       candidateController(socket, io);
       console.log("Attaching jobsController for admin...");
       jobsController(socket, io);
+
+      // Performance Management Controllers
+      console.log("Attaching performance controllers for admin...");
+      goalTypeController(socket, io);
+      goalTrackingController(socket, io);
       break;
 
     case "hr":
@@ -107,6 +115,11 @@ const router = (socket, io, role) => {
       jobsController(socket, io);
       console.log("Attaching candidate controller for hr...");
       candidateController(socket, io);
+
+      // Performance Management Controllers
+      console.log("Attaching performance controllers for hr...");
+      goalTypeController(socket, io);
+      goalTrackingController(socket, io);
       console.log("Attaching job controller for hr...");
       jobController(socket, io);
 
